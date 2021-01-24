@@ -1,9 +1,46 @@
+
+class Diamond{
+    constructor(posx, posy, posz, color)
+        {  
+            var g = new THREE.SphereGeometry(5, 4, 2);
+            var mat = new THREE.MeshLambertMaterial({ color: color, opacity: 0.9, transparent: true })
+            var m = new THREE.Mesh(g,mat );
+            m.position.x = posx;
+            m.position.y = posy;
+            m.position.z= posz;
+            THREE.Object3D.call( this );
+            
+            
+            scene.add(m);
+            
+            
+            this.par = m;
+
+
+            var animate =function(){
+                requestAnimationFrame(animate);
+                m.rotation.y += 0.01;
+        
+                m.position.y = Math.sin(framecounter / 10) + 15;
+                 }
+            animate();
+        }
+    
+
+    color(col) //zmienia kolor diamonda
+        {
+            this.par.material.color.setHex(col);
+        }
+
+    }
+
+
+
+
+
 let scene, free_camera, first_pearson_camera;
 let debug_mode = true;
 
-
-
-let diamond;
 const loader = new THREE.TextureLoader();
 
 function init() {
@@ -49,11 +86,13 @@ function init() {
     plane.position.set(0, -0.5, 0);
     scene.add(plane);
 
-    diamond = new THREE.Mesh(new THREE.SphereGeometry(5, 4, 2), new THREE.MeshLambertMaterial({ color: 0x6666ff, opacity: 0.9, transparent: true }))
 
-    diamond.position.set(0, 0, 0);
-    scene.add(diamond);
-
+    let  diamond = new Diamond(0,15,0,0xffff88); 
+    let  diamond2 = new Diamond(10,10,-10,0xff3388); 
+    let  diamond3 = new Diamond(40,30,10,0x33ff88); 
+    
+    diamond.color(0xff0000); //zmienia kolor
+    
     const axesHelper = new THREE.AxesHelper(5);
     if (debug_mode) scene.add(axesHelper);
 
@@ -70,23 +109,13 @@ function init() {
 
 
 let framecounter = 0;
+
 function render() {
 
     framecounter++;
-    diamond.rotation.y += 0.01;
-
-
-    diamond.position.y = Math.sin(framecounter / 10) + 15;
-
-
-
+    
     renderer.render(scene, free_camera);
     requestAnimationFrame(render);
-
-
-
-
-
 
 }
 
