@@ -3,6 +3,10 @@ let debug_mode = true;
 
 
 
+let player = new THREE.Group();
+
+
+
 let diamond;
 const loader = new THREE.TextureLoader();
 
@@ -22,6 +26,8 @@ function init() {
 
     free_camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
     first_pearson_camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+    first_pearson_camera.position.set(0, 2, 0);
+    player.add(first_pearson_camera);
 
 
     free_camera.position.z = 100;
@@ -57,15 +63,66 @@ function init() {
     const axesHelper = new THREE.AxesHelper(5);
     if (debug_mode) scene.add(axesHelper);
 
-
-
     let ambient = new THREE.AmbientLight(0x555555, 0.5);
     scene.add(ambient);
 
 
+    player.add(new THREE.Mesh(new THREE.BoxGeometry(1, 2, 1), new THREE.MeshLambertMaterial({ color: 0xff0000 })))
+    scene.add(player);
+
+    player.position.set(0, 1.1, 0);
+
 
     render();
 }
+
+
+
+camera_counter = 0;
+step = 0.1;
+window.addEventListener('keydown', function (event) {
+
+
+    // console.log(event.key);
+
+    switch (event.key) {
+        case 'a': // Left a
+            player.rotation.y += 0.07;
+            console.log(player.position); ww
+            break;
+
+        case 'd': // Right d 
+            console.log(player.position);
+            player.rotation.y -= 0.07;
+            break;
+
+        case 'w': // Up w
+            console.log(player.position);
+            player.position.z -= Math.cos(player.rotation.y) * step;
+            player.position.x -= Math.sin(player.rotation.y) * step;
+            break;
+
+
+        case 's': // Down s
+            console.log(player.position);
+            player.position.z += Math.cos(player.rotation.y) * step;
+            player.position.x += Math.sin(player.rotation.y) * step;
+            break;
+
+
+        case ' ': //space
+            camera_counter++;
+            console.log(camera_counter)
+            break;
+
+    }
+}, false);
+
+window.addEventListener('mouseup', function (event) {
+    first_pearson_camera.rotation
+
+
+}, false);
 
 
 
@@ -80,7 +137,16 @@ function render() {
 
 
 
-    renderer.render(scene, free_camera);
+
+
+
+    if (camera_counter % 2 == 0) {
+        renderer.render(scene, free_camera);
+    }
+    else renderer.render(scene, first_pearson_camera);
+
+
+
     requestAnimationFrame(render);
 
 
