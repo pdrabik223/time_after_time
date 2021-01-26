@@ -81,6 +81,12 @@ let scene, free_camera, first_pearson_camera;
 let debug_mode = true;
 let renderer, controls;
 
+let player = new THREE.Group();
+
+
+
+let diamond;
+
 const loader = new THREE.TextureLoader();
 
 function init() {
@@ -98,6 +104,8 @@ function init() {
 
     free_camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
     first_pearson_camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+    first_pearson_camera.position.set(0, 2, 0);
+    player.add(first_pearson_camera);
 
 
     free_camera.position.z = 100;
@@ -126,6 +134,7 @@ function init() {
  
 
 
+
     let  diamond = new Diamond(0,15,0,0xffff88); 
     let  diamond2 = new Diamond(10,10,-10,0xff3388); 
     let  diamond3 = new Diamond(40,30,10,0x33ff88); 
@@ -137,9 +146,62 @@ function init() {
     scene.add(ambient);
 
 
+    player.add(new THREE.Mesh(new THREE.BoxGeometry(1, 2, 1), new THREE.MeshLambertMaterial({ color: 0xff0000 })))
+    scene.add(player);
+
+    player.position.set(0, 1.1, 0);
+
 
     render();
 }
+
+
+
+camera_counter = 0;
+step = 0.1;
+window.addEventListener('keydown', function (event) {
+
+
+    // console.log(event.key);
+
+    switch (event.key) {
+        case 'a': // Left a
+            player.rotation.y += 0.07;
+            console.log(player.position); ww
+            break;
+
+        case 'd': // Right d 
+            console.log(player.position);
+            player.rotation.y -= 0.07;
+            break;
+
+        case 'w': // Up w
+            console.log(player.position);
+            player.position.z -= Math.cos(player.rotation.y) * step;
+            player.position.x -= Math.sin(player.rotation.y) * step;
+            break;
+
+
+        case 's': // Down s
+            console.log(player.position);
+            player.position.z += Math.cos(player.rotation.y) * step;
+            player.position.x += Math.sin(player.rotation.y) * step;
+            break;
+
+
+        case ' ': //space
+            camera_counter++;
+            console.log(camera_counter)
+            break;
+
+    }
+}, false);
+
+window.addEventListener('mouseup', function (event) {
+    first_pearson_camera.rotation
+
+
+}, false);
 
 
 
@@ -148,8 +210,23 @@ let framecounter = 0;
 function render() {
 
     framecounter++;
-    
-    renderer.render(scene, free_camera);
+
+    diamond.rotation.y += 0.01;
+
+
+    diamond.position.y = Math.sin(framecounter / 10) + 15;
+
+
+
+
+
+
+    if (camera_counter % 2 == 0) {
+        renderer.render(scene, free_camera);
+    }
+    else renderer.render(scene, first_pearson_camera);
+
+
     requestAnimationFrame(render);
 
 }
