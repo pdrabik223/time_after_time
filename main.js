@@ -352,6 +352,34 @@ function init() {
 
 
     add_platform(new THREE.Vector3(100, 55, 2250), new THREE.Vector3(40, 3, 90));
+
+    add_platform(new THREE.Vector3(80, 40, 2400), new THREE.Vector3(40, 3, 60));
+
+    add_platform(new THREE.Vector3(60, 40, 2500), new THREE.Vector3(40, 3, 50));
+
+    add_platform(new THREE.Vector3(40, 40, 2600), new THREE.Vector3(30, 3, 50));
+
+    add_platform(new THREE.Vector3(30, 40, 2700), new THREE.Vector3(30, 3, 50));
+
+
+    add_platform(new THREE.Vector3(40, 40, 2800), new THREE.Vector3(30, 3, 80));
+
+    add_platform(new THREE.Vector3(50, 45, 2900), new THREE.Vector3(30, 3, 90));
+
+
+    add_platform(new THREE.Vector3(60, 50, 3000), new THREE.Vector3(30, 3, 90));
+
+
+    add_platform(new THREE.Vector3(70, 55, 3150), new THREE.Vector3(30, 3, 120));
+
+
+    add_platform(new THREE.Vector3(80, 55, 3300), new THREE.Vector3(80, 3, 100));
+
+
+
+    add_platform(new THREE.Vector3(600, 60, 3400), new THREE.Vector3(80, 3, 80));
+
+
     add_platform(new THREE.Vector3(70, 65, 3500), new THREE.Vector3(80, 3, 80));
     add_platform(new THREE.Vector3(40, 75, 3600), new THREE.Vector3(80, 3, 80));
     add_platform(new THREE.Vector3(-60, 95, 3650), new THREE.Vector3(80, 3, 80));
@@ -739,6 +767,15 @@ function render() {
 
     }
     player.position.set(player.position.x + v_przemieszczenia.x, player.position.y + v_przemieszczenia.y, player.position.z + v_przemieszczenia.z);
+    if (player.position.y < -100) {
+
+        player.position.set(0, 50, -45);
+        timer = new THREE.Clock(true);
+        v_przemieszczenia.set(0, 0, 0);
+        s_position.set(0, 50, -45);
+        s_v_przemieszczenia.set(0, 0, 0);
+
+    }
 
     if (distance(new THREE.Vector3(player.position.x, player.position.y, player.position.z), new THREE.Vector3(-100, 2.5, 100)) < 20) {
         timer.stop();
