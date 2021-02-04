@@ -4,13 +4,20 @@ import { PointerLockControls } from './js/jsm/controls/PointerLockControls.js';
 
 
 
-function distance(vector1, vector2, radius) {
+function distance(vector1, vector2) {
 
-    if (Math.sqrt(Math.pow(vector2.x - vector1.x) + Math.pow(vector2.y - vector1.y) + Math.pow(vector2.z - vector1.z)) < radius) return true;
-    else return false;
+
+    return (Math.pow(vector2.x - vector1.x, 2) + Math.pow(vector2.y - vector1.y, 2) + Math.pow(vector2.z - vector1.z, 2));
+
 
 
 }
+
+
+
+let sun_sprite;
+let mountines;
+
 
 let player_mesh;
 let scene, free_camera, first_pearson_camera, player_camera;
@@ -49,14 +56,14 @@ function init() {
 
     const light = new THREE.DirectionalLight(0x333333, 4, 100);
     light.position.set(50, 50, 50); //default; light shining from top
-    light.castShadow = true; // default false
+
 
     scene.add(light);
 
     scene.add(new THREE.DirectionalLightHelper(light, 5))
 
 
-    player_camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+    player_camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 0.1, 10000);
     player_camera.position.set(0, 0.9, 0);
 
     player.add(player_camera);
@@ -65,12 +72,12 @@ function init() {
 
 
     scene.background = new THREE.CubeTextureLoader().setPath('textures/skybox/').load([
-        'boki_skyboxa.png',
-        'boki_skyboxa.png',
-        'gora_i_guess.png',
-        'gora_i_guess.png',
-        'boki_skyboxa.png',
-        'boki_skyboxa.png'
+        'px.jpg', // px
+        'nx.jpg', // nx
+        'py.jpg', // py
+        'ny.jpg', // ny
+        'pz.jpg', // pz
+        'nz.jpg'  // nz
     ]);
 
 
@@ -89,62 +96,124 @@ function init() {
 
     // player_camera.add(Aim_point = new THREE.Mesh(new THREE.SphereGeometry(0.05, 32, 32), new THREE.MeshBasicMaterial({ color: 0xff0000 })));
     // Aim_point.position.set(0, 0, 2);
-    Aim_point = new THREE.Mesh(new THREE.SphereGeometry(0.05, 10, 10), new THREE.MeshBasicMaterial({ transparent: true, opacity: 0 }));
+    Aim_point = new THREE.Mesh(new THREE.SphereGeometry(0.05, 10, 10), new THREE.MeshBasicMaterial({ visible: false }));
 
     player.add(Aim_point);
 
     let ambient = new THREE.AmbientLight(0x555555, 0.5);
     scene.add(ambient);
 
-    player_mesh = new THREE.Mesh(new THREE.BoxGeometry(0.25, 3, 0.25), new THREE.MeshBasicMaterial({ color: 0xff0000, transparent: true, opacity: 0 }));
+    player_mesh = new THREE.Mesh(new THREE.BoxGeometry(0.25, 3, 0.25), new THREE.MeshBasicMaterial({ color: 0xff0000, visible: false }));
 
     player.add(player_mesh);
 
     scene.add(player);
 
+    let point_light = new THREE.DirectionalLight(0x17d2fc, 5, 100);
+    point_light.position.set(0, 100, 1400); //default; light shining from t
+
+    sun_sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.TextureLoader().load('textures/slonce.png') }));
+    sun_sprite.position.set(0, 100, 1400)
+    sun_sprite.scale.set(500, 500, 500)
+    sun_sprite.add(point_light);
+    //sun_sprite.scale(new THREE.Vector3(30, 30, 30));
+    scene.add(sun_sprite);
+
     player.position.set(0, 50, 0);
-    {
-        let plane = new THREE.Mesh(new THREE.BoxGeometry(1000, 1000, 0.5, 10, 10, 10), new THREE.MeshBasicMaterial({ color: 0x49126b, transparent: true, opacity: 0.9 }));
-        plane.rotation.x += 3.1425 / 2;
-        geometry_arr.push(plane);
 
-        scene.add(plane);
-        ambient = new THREE.AmbientLight(0x555555, 0.5);
+    let plane = new THREE.Mesh(new THREE.BoxGeometry(1000, 0.5, 2000, 10, 10, 10), new THREE.MeshLambertMaterial({ color: 0x49126b }));
 
-        grey1 = new THREE.Mesh(new THREE.BoxGeometry(5, 5, 5, 10, 10, 10), new THREE.MeshBasicMaterial({ color: 0xfa7d0f, transparent: true, opacity: 0.9 }));
-        grey1.rotation.x += 3.1425 / 2;
-        grey1.position.set(5, 0, 5);
-        geometry_arr.push(grey1);
-        scene.add(grey1);
-
-        let grey2 = new THREE.Mesh(new THREE.BoxGeometry(5, 5, 5, 10, 10, 10), new THREE.MeshBasicMaterial({ color: 0x17d2fc, transparent: true, opacity: 0.9 }));
-        grey2.rotation.x += 3.1425 / 2;
-        grey2.position.set(-5, 2.5, 5);
-        geometry_arr.push(grey2);
-        scene.add(grey2);
-
-        let grey3 = new THREE.Mesh(new THREE.BoxGeometry(5, 5, 5, 10, 10, 10), new THREE.MeshBasicMaterial({ color: 0xff59fc, transparent: true, opacity: 0.9 }));
-        grey3.rotation.x += 3.1425 / 2;
-        grey3.position.set(5, 5, -5);
-        geometry_arr.push(grey3);
-        scene.add(grey3);
-
-
-        let grey4 = new THREE.Mesh(new THREE.BoxGeometry(5, 5, 5, 10, 10, 10), new THREE.MeshBasicMaterial({ color: 0x444444, transparent: true, opacity: 0.9 }));
-        grey4.rotation.x += 3.1425 / 2;
-        grey4.position.set(-5, 7, -5);
-        geometry_arr.push(grey4);
-        scene.add(grey4);
-
-        let dyjamond = new THREE.Mesh(new THREE.SphereGeometry(4, 4, 2), new THREE.MeshBasicMaterial({ color: 0x17d2fc, transparent: true, opacity: 0.9 }));
-        dyjamond.position.set(-100, 2.5, 100);
-        geometry_arr.push(dyjamond);
-        scene.add(dyjamond);
+    geometry_arr.push(plane);
+    scene.add(plane);
+    let plane_lines = new THREE.LineSegments(new THREE.WireframeGeometry(new THREE.BoxGeometry(1000.01, 0.51, 2000.01, 80, 80, 160)), new THREE.LineBasicMaterial({ color: 0xff59fc, linewidth: 2 }));
 
 
 
 
-    }
+    //   plane_lines.material.color = 0xff59fc;
+    scene.add(plane_lines);
+
+    let moutains_r = new THREE.Mesh(new THREE.PlaneGeometry(1898, 240), new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('textures/gory.png'), transparent: true }));
+    moutains_r.position.set(-700, 120, 0);
+    moutains_r.scale.set(2, 2, 2);
+    moutains_r.rotation.set(3.1415 / 2, 3.1415 / 2, -3.1415 / 2)
+
+    scene.add(moutains_r)
+    let moutains_background_r = new THREE.Mesh(new THREE.PlaneGeometry(1898, 240), new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('textures/gory_2s.png'), transparent: true }));
+    moutains_background_r.position.set(-850, 380, 0);
+    moutains_background_r.scale.set(3.5, 3.5, 3.5);
+    moutains_background_r.rotation.set(3.1415 / 2, 3.1415 / 2, -3.1415 / 2)
+
+    scene.add(moutains_background_r)
+
+
+
+
+
+    let moutains_l = new THREE.Mesh(new THREE.PlaneGeometry(7680, 971), new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('textures/gory_3.png'), transparent: true }));
+    moutains_l.position.set(700, 120, 0);
+    moutains_l.scale.set(0.9, 0.9, 0.9);
+    moutains_l.rotation.set(3.1415 / 2, -3.1415 / 2, 3.1415 / 2)
+
+    scene.add(moutains_l)
+    let moutains_background_l = new THREE.Mesh(new THREE.PlaneGeometry(7680, 971), new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('textures/gory_3.png'), transparent: true }));
+    moutains_background_l.position.set(850, 380, 0);
+    moutains_background_l.scale.set(1, 1, 1);
+    moutains_background_l.rotation.set(3.1415 / 2, -3.1415 / 2, 3.1415 / 2)
+    scene.add(moutains_background_l)
+
+
+    /*
+        let ground = new THREE.Mesh(new THREE.PlaneGeometry(1600, 4000), new THREE.MeshLambertMaterial({ color: 0x49126b }));
+        ground.rotation.set(3.1415 / 2, 3.1415 / 2, -3.1415 / 2)
+    
+        ground.position.y = -300;
+        scene.add(ground);
+    
+        let ground_lines = new THREE.LineSegments(new THREE.WireframeGeometry(ground), new THREE.LineBasicMaterial({ color: 0xff59fc, linewidth: 2 }));
+        ground_lines.position.y = -299.5;
+        scene.add(ground_lines);
+    */
+
+
+
+
+    ambient = new THREE.AmbientLight(0x555555, 0.5);
+
+    grey1 = new THREE.Mesh(new THREE.BoxGeometry(5, 5, 5, 10, 10, 10), new THREE.MeshBasicMaterial({ color: 0xfa7d0f, transparent: true, opacity: 0.9 }));
+
+    grey1.position.set(5, 0, 5);
+    geometry_arr.push(grey1);
+    scene.add(grey1);
+
+    let grey2 = new THREE.Mesh(new THREE.BoxGeometry(5, 5, 5, 10, 10, 10), new THREE.MeshBasicMaterial({ color: 0x17d2fc, transparent: true, opacity: 0.9 }));
+
+    grey2.position.set(-5, 2.5, 5);
+    geometry_arr.push(grey2);
+    scene.add(grey2);
+
+    let grey3 = new THREE.Mesh(new THREE.BoxGeometry(5, 5, 5, 10, 10, 10), new THREE.MeshBasicMaterial({ color: 0xff59fc, transparent: true, opacity: 0.9 }));
+    grey3.rotation.x += 3.1425 / 2;
+    grey3.position.set(5, 5, -5);
+    geometry_arr.push(grey3);
+    scene.add(grey3);
+
+
+    let grey4 = new THREE.Mesh(new THREE.BoxGeometry(5, 5, 5, 10, 10, 10), new THREE.MeshBasicMaterial({ color: 0x444444, transparent: true, opacity: 0.9 }));
+
+    grey4.position.set(-5, 7, -5);
+    geometry_arr.push(grey4);
+    scene.add(grey4);
+
+    let dyjamond = new THREE.Mesh(new THREE.SphereGeometry(4, 4, 2), new THREE.MeshBasicMaterial({ color: 0x17d2fc, transparent: true, opacity: 0.9 }));
+    dyjamond.position.set(-100, 2.5, 100);
+    geometry_arr.push(dyjamond);
+    scene.add(dyjamond);
+
+
+
+
+
     timer.start();
     scene.add(ambient);
     render();
@@ -198,6 +267,9 @@ const onKeyDown = function (event) {
 
             free_camera_bool = true;
             break;
+        case 'KeyE':
+            console.log(player.position);
+            break;
 
 
     }
@@ -245,6 +317,7 @@ const onKeyUp = function (event) {
         case 'KeyR':
             player.position.set(0, 50, 0);
             timer = new THREE.Clock(true);
+            v_przemieszczenia.set(0, 0, 0);
             break;
 
 
@@ -285,6 +358,8 @@ function set_time() {
 
 function render() {
     set_time();
+    sun_sprite.position.z = 1000 + player.position.z;
+
     framecounter++;
 
     player_camera.getWorldDirection(v_direction);
@@ -403,7 +478,7 @@ function render() {
         c_d = false;
         canJump = true;
         v_przemieszczenia.y = Math.max(v_przemieszczenia.y, 0);
-        console.log("jump!");
+
     }
     else { canJump = false; }
 
@@ -450,9 +525,7 @@ function render() {
     }
     player.position.set(player.position.x + v_przemieszczenia.x, player.position.y + v_przemieszczenia.y, player.position.z + v_przemieszczenia.z);
 
-
-
-    if (distance(player.position, new THREE.Vector3(-100, 2.5, 100), 4)) {
+    if (distance(new THREE.Vector3(player.position.x, player.position.y, player.position.z), new THREE.Vector3(-100, 2.5, 100)) < 20) {
         timer.stop();
         document.getElementById("time").innerHTML = timer.getElapsedTime().toFixed(2) + " NEW PB!";
     }
