@@ -1,0 +1,10 @@
+.overlay-box {
+    background-color:#fff;
+            width:550px;
+    left:50%;
+        margin-left:-275px;
+        margin-bottom: 5px;
+    position:fixed;
+    text-align:center;
+    border:1px solid #000;
+    }
