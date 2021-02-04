@@ -45,6 +45,7 @@ const direction = new THREE.Vector3();
 let raycaster;
 
 let geometry_arr = [];
+let frustum = new THREE.Frustum();
 
 var grey1;
 function init() {
@@ -84,7 +85,7 @@ function init() {
     renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
 
-
+    render.sortObjects = false;
 
 
     document.body.appendChild(renderer.domElement);
@@ -97,6 +98,7 @@ function init() {
     // player_camera.add(Aim_point = new THREE.Mesh(new THREE.SphereGeometry(0.05, 32, 32), new THREE.MeshBasicMaterial({ color: 0xff0000 })));
     // Aim_point.position.set(0, 0, 2);
     Aim_point = new THREE.Mesh(new THREE.SphereGeometry(0.05, 10, 10), new THREE.MeshBasicMaterial({ visible: false }));
+
 
     player.add(Aim_point);
 
@@ -133,35 +135,45 @@ function init() {
     //   plane_lines.material.color = 0xff59fc;
     scene.add(plane_lines);
 
-    let moutains_r = new THREE.Mesh(new THREE.PlaneGeometry(1898, 240), new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('textures/gory.png'), transparent: true }));
+    let moutains_r = new THREE.Mesh(new THREE.PlaneGeometry(1898, 240), new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('textures/gory.png'), side: THREE.DoubleSide, transparent: true, depthWrite: false }));
     moutains_r.position.set(-700, 120, 0);
     moutains_r.scale.set(2, 2, 2);
     moutains_r.rotation.set(3.1415 / 2, 3.1415 / 2, -3.1415 / 2)
 
-    scene.add(moutains_r)
+    moutains_r.renderOrder = 110;
+
+    scene.add(moutains_r);
+
     let moutains_background_r = new THREE.Mesh(new THREE.PlaneGeometry(1898, 240), new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('textures/gory_2s.png'), transparent: true }));
+    moutains_background_r.side = THREE.DoubleSide;
     moutains_background_r.position.set(-850, 380, 0);
     moutains_background_r.scale.set(3.5, 3.5, 3.5);
     moutains_background_r.rotation.set(3.1415 / 2, 3.1415 / 2, -3.1415 / 2)
 
-    scene.add(moutains_background_r)
+
+    scene.add(moutains_background_r);
 
 
 
 
 
-    let moutains_l = new THREE.Mesh(new THREE.PlaneGeometry(7680, 971), new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('textures/gory_3.png'), transparent: true }));
+    let moutains_l = new THREE.Mesh(new THREE.PlaneGeometry(1898, 240), new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('textures/gory.png'), side: THREE.DoubleSide, transparent: true, depthWrite: false }));
+
     moutains_l.position.set(700, 120, 0);
-    moutains_l.scale.set(0.9, 0.9, 0.9);
+    moutains_l.scale.set(2, 2, 2);
     moutains_l.rotation.set(3.1415 / 2, -3.1415 / 2, 3.1415 / 2)
 
-    scene.add(moutains_l)
-    let moutains_background_l = new THREE.Mesh(new THREE.PlaneGeometry(7680, 971), new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('textures/gory_3.png'), transparent: true }));
-    moutains_background_l.position.set(850, 380, 0);
-    moutains_background_l.scale.set(1, 1, 1);
-    moutains_background_l.rotation.set(3.1415 / 2, -3.1415 / 2, 3.1415 / 2)
-    scene.add(moutains_background_l)
+    moutains_l.renderOrder = 110;
 
+    scene.add(moutains_l);
+
+    let moutains_background_l = new THREE.Mesh(new THREE.PlaneGeometry(1898, 240), new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('textures/gory_2s.png'), transparent: true }));
+    moutains_background_l.side = THREE.DoubleSide;
+    moutains_background_l.position.set(850, 380, 0);
+    moutains_background_l.scale.set(3.5, 3.5, 3.5);
+    moutains_background_l.rotation.set(3.1415 / 2, -3.1415 / 2, 3.1415 / 2)
+
+    scene.add(moutains_background_l);
 
     /*
         let ground = new THREE.Mesh(new THREE.PlaneGeometry(1600, 4000), new THREE.MeshLambertMaterial({ color: 0x49126b }));
