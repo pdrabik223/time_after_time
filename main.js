@@ -12,15 +12,55 @@ function distance(vector1, vector2) {
 
 
 }
+function add_platform(position, size) {
 
 
+
+    let box = new THREE.Mesh(new THREE.BoxGeometry(size.x, size.y, size.z, 10, 10, 10), new THREE.MeshBasicMaterial({ color: 0x0048ff, transparent: true, opacity: 0.9 }));
+
+    box.position.copy(position);
+    geometry_arr.push(box);
+    scene.add(box);
+
+
+    let wireframe = new THREE.LineSegments(new THREE.WireframeGeometry(new THREE.BoxGeometry(size.x + 0.1, size.y + 0.1, size.z + 0.1, 1, 1, 1)), new THREE.LineBasicMaterial({ color: 0x00d0ff, linewidth: 1 }));
+    wireframe.position.copy(position);
+    scene.add(wireframe);
+
+}
+var timer = new THREE.Clock();
+
+function play() {
+    Element.prototype.remove = function () {
+        this.parentElement.removeChild(this);
+    }
+    NodeList.prototype.remove = HTMLCollection.prototype.remove = function () {
+        for (var i = this.length - 1; i >= 0; i--) {
+            if (this[i] && this[i].parentElement) {
+                this[i].parentElement.removeChild(this[i]);
+
+
+            }
+        }
+    }
+
+    controls.lock();
+    document.getElementById("start").remove();
+    document.getElementById("menu").remove();
+    timer.start();
+    music_start();
+};
 
 let sun_sprite;
-let mountines;
 
+let listener;
+let sound;
+let audioLoader;
+let music_plays = false;
+let mute_on = false;
 
 let player_mesh;
-let scene, free_camera, first_pearson_camera, player_camera;
+let scene, player_camera;
 let debug_mode = true;
 let renderer, controls;
 let ambient;
@@ -28,7 +68,7 @@ let player = new THREE.Group();
 let Aim_point;
 
 
-var timer = new THREE.Clock();
+
 let moveForward = false;
 let moveBackward = false;
 let moveLeft = false;
@@ -61,7 +101,7 @@ function init() {
 
     scene.add(light);
 
-    scene.add(new THREE.DirectionalLightHelper(light, 5))
+
 
 
     player_camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 0.1, 10000);
@@ -73,12 +113,12 @@ function init() {
 
 
     scene.background = new THREE.CubeTextureLoader().setPath('textures/skybox/').load([
-        'px.jpg', // px
-        'nx.jpg', // nx
-        'py.jpg', // py
-        'ny.jpg', // ny
-        'pz.jpg', // pz
-        'nz.jpg'  // nz
+        'px.png', // px
+        'nx.png', // nx
+        'py.png', // py
+        'ny.png', // ny
+        'pz.png', // pz
+        'nz.png'  // nz
     ]);
 
 
@@ -90,50 +130,44 @@ function init() {
 
     document.body.appendChild(renderer.domElement);
 
+    listener = new THREE.AudioListener();
+    player_camera.add(listener);
 
+    sound = new THREE.Audio(listener);
+
+    audioLoader = new THREE.AudioLoader();
 
     raycaster = new THREE.Raycaster(new THREE.Vector3(), new THREE.Vector3(0, - 1, 0), 0, 10);
-
-
-    // player_camera.add(Aim_point = new THREE.Mesh(new THREE.SphereGeometry(0.05, 32, 32), new THREE.MeshBasicMaterial({ color: 0xff0000 })));
-    // Aim_point.position.set(0, 0, 2);
     Aim_point = new THREE.Mesh(new THREE.SphereGeometry(0.05, 10, 10), new THREE.MeshBasicMaterial({ visible: false }));
-
-
     player.add(Aim_point);
-
     let ambient = new THREE.AmbientLight(0x555555, 0.5);
     scene.add(ambient);
-
     player_mesh = new THREE.Mesh(new THREE.BoxGeometry(0.25, 3, 0.25), new THREE.MeshBasicMaterial({ color: 0xff0000, visible: false }));
-
     player.add(player_mesh);
-
     scene.add(player);
-
-    let point_light = new THREE.DirectionalLight(0x17d2fc, 5, 100);
-    point_light.position.set(0, 100, 1400); //default; light shining from t
-
     sun_sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.TextureLoader().load('textures/slonce.png') }));
     sun_sprite.position.set(0, 100, 1400)
     sun_sprite.scale.set(500, 500, 500)
-    sun_sprite.add(point_light);
-    //sun_sprite.scale(new THREE.Vector3(30, 30, 30));
+
+    sun_sprite.renderOrder = 120;
     scene.add(sun_sprite);
 
-    player.position.set(0, 50, 0);
+    player.position.set(0, 50, -45);
 
-    let plane = new THREE.Mesh(new THREE.BoxGeometry(1000, 0.5, 2000, 10, 10, 10), new THREE.MeshLambertMaterial({ color: 0x49126b }));
+
+
+
+    let plane = new THREE.Mesh(new THREE.BoxGeometry(100, 0.5, 100, 10, 10, 10), new THREE.MeshLambertMaterial({ color: 0x49126b }));
 
     geometry_arr.push(plane);
+
     scene.add(plane);
-    let plane_lines = new THREE.LineSegments(new THREE.WireframeGeometry(new THREE.BoxGeometry(1000.01, 0.51, 2000.01, 80, 80, 160)), new THREE.LineBasicMaterial({ color: 0xff59fc, linewidth: 2 }));
+    let plane_lines = new THREE.LineSegments(new THREE.WireframeGeometry(new THREE.BoxGeometry(100.01, 0.51, 100.01, 6, 6, 6)), new THREE.LineBasicMaterial({ color: 0xff59fc, linewidth: 2 }));
 
-
-
-
-    //   plane_lines.material.color = 0xff59fc;
     scene.add(plane_lines);
+
+
+
 
     let moutains_r = new THREE.Mesh(new THREE.PlaneGeometry(1898, 240), new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('textures/gory.png'), side: THREE.DoubleSide, transparent: true, depthWrite: false }));
     moutains_r.position.set(-700, 120, 0);
@@ -154,6 +188,60 @@ function init() {
     scene.add(moutains_background_r);
 
 
+    let moutains_r_2 = new THREE.Mesh(new THREE.PlaneGeometry(1898, 240), new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('textures/gory.png'), side: THREE.DoubleSide, transparent: true, depthWrite: false }));
+    moutains_r_2.position.set(-700, 120, 3796);
+    moutains_r_2.scale.set(2, 2, 2);
+    moutains_r_2.rotation.set(3.1415 / 2, 3.1415 / 2, -3.1415 / 2)
+
+    moutains_r_2.renderOrder = 110;
+
+    scene.add(moutains_r_2);
+
+    let moutains_background_r_2 = new THREE.Mesh(new THREE.PlaneGeometry(1898, 240), new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('textures/gory_2s.png'), transparent: true }));
+    moutains_background_r_2.side = THREE.DoubleSide;
+    moutains_background_r_2.position.set(-850, 380, 6643);
+    moutains_background_r_2.scale.set(3.5, 3.5, 3.5);
+    moutains_background_r_2.rotation.set(3.1415 / 2, 3.1415 / 2, -3.1415 / 2)
+
+
+    scene.add(moutains_background_r_2);
+
+
+    let moutains_l_b = new THREE.Mesh(new THREE.PlaneGeometry(1460, 240), new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('textures/gory.png'), side: THREE.DoubleSide, transparent: true, depthWrite: false }));
+
+    moutains_l_b.position.set(700, 120, -1989);
+    moutains_l_b.scale.set(2, 2, 2);
+
+
+    moutains_l_b.renderOrder = 100;
+
+    scene.add(moutains_l_b);
+
+    let moutains_background_l_b = new THREE.Mesh(new THREE.PlaneGeometry(1400, 240), new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('textures/gory_2s.png'), transparent: true }));
+    moutains_background_l_b.side = THREE.DoubleSide;
+    moutains_background_l_b.position.set(850, 380, -2189);
+    moutains_background_l_b.scale.set(3.5, 3.5, 3.5);
+
+
+    scene.add(moutains_background_l_b);
+    /*
+        let moutains_l_f = new THREE.Mesh(new THREE.PlaneGeometry(1460, 240), new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('textures/gory.png'), side: THREE.DoubleSide, transparent: true, depthWrite: false }));
+    
+        moutains_l_f.position.set(700, 120, 3796 + 11898);
+        moutains_l_f.scale.set(2, 2, 2);
+        moutains_l_f.rotation.y = 3.1415 / 2;
+    
+        moutains_l_f.renderOrder = 100;
+    
+        scene.add(moutains_l_f);
+    
+        let moutains_background_l_f = new THREE.Mesh(new THREE.PlaneGeometry(1400, 240), new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('textures/gory_2s.png'), transparent: true }));
+        moutains_background_l_f.side = THREE.DoubleSide;
+        moutains_background_l_f.position.set(850, 380, 3796 + 1898);
+        moutains_background_l_f.scale.set(3.5, 3.5, 3.5);
+        moutains_background_l_f.rotation.y = 3.1415 / 2;
+        scene.add(moutains_background_l_f);
+    */
 
 
 
@@ -175,55 +263,120 @@ function init() {
 
     scene.add(moutains_background_l);
 
-    /*
-        let ground = new THREE.Mesh(new THREE.PlaneGeometry(1600, 4000), new THREE.MeshLambertMaterial({ color: 0x49126b }));
-        ground.rotation.set(3.1415 / 2, 3.1415 / 2, -3.1415 / 2)
-    
-        ground.position.y = -300;
-        scene.add(ground);
-    
-        let ground_lines = new THREE.LineSegments(new THREE.WireframeGeometry(ground), new THREE.LineBasicMaterial({ color: 0xff59fc, linewidth: 2 }));
-        ground_lines.position.y = -299.5;
-        scene.add(ground_lines);
-    */
+
+
+
+    let moutains_l_2 = new THREE.Mesh(new THREE.PlaneGeometry(1898, 240), new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('textures/gory.png'), side: THREE.DoubleSide, transparent: true, depthWrite: false }));
+
+    moutains_l_2.position.set(700, 120, 3796);
+    moutains_l_2.scale.set(2, 2, 2);
+    moutains_l_2.rotation.set(3.1415 / 2, -3.1415 / 2, 3.1415 / 2)
+
+    moutains_l_2.renderOrder = 110;
+
+    scene.add(moutains_l_2);
+
+    let moutains_background_l_2 = new THREE.Mesh(new THREE.PlaneGeometry(1898, 240), new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('textures/gory_2s.png'), transparent: true }));
+    moutains_background_l_2.side = THREE.DoubleSide;
+    moutains_background_l_2.position.set(850, 380, 6643);
+    moutains_background_l_2.scale.set(3.5, 3.5, 3.5);
+    moutains_background_l_2.rotation.set(3.1415 / 2, -3.1415 / 2, 3.1415 / 2)
+
+    scene.add(moutains_background_l_2);
+
+
+
+
+
+    // groun the lowes point 
+    let ground = new THREE.Mesh(new THREE.PlaneGeometry(1600, 4000), new THREE.MeshBasicMaterial({ color: 0x49126b }));
+    ground.rotation.x = -3.1415 / 2;
+    ground.position.y = -100;
+    scene.add(ground);
+
+    let ground_lines = new THREE.LineSegments(new THREE.WireframeGeometry(new THREE.PlaneGeometry(1600, 4000, 25, 50)), new THREE.LineBasicMaterial({ color: 0xff59fc, linewidth: 4 }));
+
+    ground_lines.position.y = -99.5;
+    ground_lines.rotation.x = -3.1415 / 2
+    scene.add(ground_lines);
+
+
+    let ground_2 = new THREE.Mesh(new THREE.PlaneGeometry(1600, 4000), new THREE.MeshBasicMaterial({ color: 0x49126b }));
+    ground_2.rotation.x = -3.1415 / 2;
+    ground_2.position.y = -100;
+    ground_2.position.z = 4000;
+    scene.add(ground_2);
+
+    let ground_lines_2 = new THREE.LineSegments(new THREE.WireframeGeometry(new THREE.PlaneGeometry(1600, 4000, 25, 50)), new THREE.LineBasicMaterial({ color: 0xff59fc, linewidth: 4 }));
+
+    ground_lines_2.position.y = -99.5;
+    ground_lines_2.rotation.x = -3.1415 / 2
+    ground_lines_2.position.z = 4000;
+    scene.add(ground_lines_2);
+
+
 
 
 
 
     ambient = new THREE.AmbientLight(0x555555, 0.5);
 
-    grey1 = new THREE.Mesh(new THREE.BoxGeometry(5, 5, 5, 10, 10, 10), new THREE.MeshBasicMaterial({ color: 0xfa7d0f, transparent: true, opacity: 0.9 }));
-
-    grey1.position.set(5, 0, 5);
-    geometry_arr.push(grey1);
-    scene.add(grey1);
-
-    let grey2 = new THREE.Mesh(new THREE.BoxGeometry(5, 5, 5, 10, 10, 10), new THREE.MeshBasicMaterial({ color: 0x17d2fc, transparent: true, opacity: 0.9 }));
-
-    grey2.position.set(-5, 2.5, 5);
-    geometry_arr.push(grey2);
-    scene.add(grey2);
-
-    let grey3 = new THREE.Mesh(new THREE.BoxGeometry(5, 5, 5, 10, 10, 10), new THREE.MeshBasicMaterial({ color: 0xff59fc, transparent: true, opacity: 0.9 }));
-    grey3.rotation.x += 3.1425 / 2;
-    grey3.position.set(5, 5, -5);
-    geometry_arr.push(grey3);
-    scene.add(grey3);
 
 
-    let grey4 = new THREE.Mesh(new THREE.BoxGeometry(5, 5, 5, 10, 10, 10), new THREE.MeshBasicMaterial({ color: 0x444444, transparent: true, opacity: 0.9 }));
+    add_platform(new THREE.Vector3(0, 3, 80), new THREE.Vector3(50, 8, 60));
+    add_platform(new THREE.Vector3(-40, 3, 240), new THREE.Vector3(50, 6, 70));
 
-    grey4.position.set(-5, 7, -5);
-    geometry_arr.push(grey4);
-    scene.add(grey4);
+    add_platform(new THREE.Vector3(40, 9, 350), new THREE.Vector3(30, 8, 80));
+
+    add_platform(new THREE.Vector3(-20, 11, 450), new THREE.Vector3(30, 2, 80));
+
+    add_platform(new THREE.Vector3(-30, 8, 600), new THREE.Vector3(50, 4, 80));
+    add_platform(new THREE.Vector3(20, 14, 750), new THREE.Vector3(50, 3, 50));
+
+    add_platform(new THREE.Vector3(60, 15, 880), new THREE.Vector3(40, 2, 80));
+
+
+    add_platform(new THREE.Vector3(90, 20, 990), new THREE.Vector3(40, 4, 60));
+
+
+    add_platform(new THREE.Vector3(60, 30, 1100), new THREE.Vector3(50, 5, 90));
+
+
+    add_platform(new THREE.Vector3(90, 35, 1300), new THREE.Vector3(40, 5, 80));
+    add_platform(new THREE.Vector3(110, 40, 1500), new THREE.Vector3(30, 4, 80));
+
+    add_platform(new THREE.Vector3(140, 45, 1600), new THREE.Vector3(20, 3, 80));
+
+    add_platform(new THREE.Vector3(130, 60, 1750), new THREE.Vector3(40, 3, 80));
+    add_platform(new THREE.Vector3(120, 55, 1850), new THREE.Vector3(40, 3, 120));
+
+
+    add_platform(new THREE.Vector3(100, 55, 2250), new THREE.Vector3(40, 3, 90));
+    add_platform(new THREE.Vector3(70, 65, 3500), new THREE.Vector3(80, 3, 80));
+    add_platform(new THREE.Vector3(40, 75, 3600), new THREE.Vector3(80, 3, 80));
+    add_platform(new THREE.Vector3(-60, 95, 3650), new THREE.Vector3(80, 3, 80));
+    add_platform(new THREE.Vector3(-110, 105, 3600), new THREE.Vector3(80, 3, 80));
+    add_platform(new THREE.Vector3(-110, 105, 3550), new THREE.Vector3(80, 3, 80));
+
+    add_platform(new THREE.Vector3(-190, 125, 3450), new THREE.Vector3(80, 3, 80));
+
+
+    add_platform(new THREE.Vector3(-210, 135, 3300), new THREE.Vector3(80, 3, 80));
+
+    add_platform(new THREE.Vector3(-180, 145, 3200), new THREE.Vector3(60, 3, 70));
+    add_platform(new THREE.Vector3(-160, 155, 3100), new THREE.Vector3(60, 3, 70));
+
+    add_platform(new THREE.Vector3(-180, 165, 3000), new THREE.Vector3(90, 3, 90));
+
 
     let dyjamond = new THREE.Mesh(new THREE.SphereGeometry(4, 4, 2), new THREE.MeshBasicMaterial({ color: 0x17d2fc, transparent: true, opacity: 0.9 }));
-    dyjamond.position.set(-100, 2.5, 100);
+    dyjamond.position.set(-180, 155, 2900);
     geometry_arr.push(dyjamond);
     scene.add(dyjamond);
 
 
-
+    document.getElementById("start").onclick = function () { play() };
+    document.getElementById("sound").onclick = function () { mute() };
 
 
     timer.start();
@@ -231,6 +384,40 @@ function init() {
     render();
 }
 
+let s_v_przemieszczenia = new THREE.Vector3(0, 0, 0);
+let s_position = new THREE.Vector3(0, 50, -45);
+
+function music_start() {
+    audioLoader.load('sounds/tapes.mp3', function (buffer) {
+        sound.setBuffer(buffer);
+        sound.setLoop(true);
+        sound.setVolume(0.2);
+        sound.play();
+        music_plays = true;
+    });
+}
+
+function mute() {
+    if (mute_on) {
+        if (!music_plays) {
+            sound.play();
+            music_plays = true;
+        }
+        else {
+            sound.setVolume(0.2);
+            mute_on = false;
+        }
+    }
+    else {
+        sound.setVolume(0.0);
+        mute_on = true;
+    }
+}
+
+function music_stop() {
+    sound.pause();
+    music_plays = false;
+}
 
 
 const onKeyDown = function (event) {
@@ -270,17 +457,13 @@ const onKeyDown = function (event) {
 
             break;
 
-        case 'KeyF':
-            ctrl = true;
 
 
-            break;
-        case 'KeyP':
-
-            free_camera_bool = true;
-            break;
         case 'KeyE':
-            console.log(player.position);
+            s_v_przemieszczenia.copy(v_przemieszczenia);
+            s_position.copy(player.position);
+
+
             break;
 
 
@@ -327,12 +510,32 @@ const onKeyUp = function (event) {
 
             break;
         case 'KeyR':
-            player.position.set(0, 50, 0);
-            timer = new THREE.Clock(true);
-            v_przemieszczenia.set(0, 0, 0);
+            player.position.copy(s_position);
+            // timer = new THREE.Clock(true);
+            v_przemieszczenia.copy(s_v_przemieszczenia);
             break;
 
+        case 'KeyP':
+            player.position.set(0, 50, -45);
+            timer = new THREE.Clock(true);
+            v_przemieszczenia.set(0, 0, 0);
+            s_position.set(0, 50, -45);
+            s_v_przemieszczenia.set(0, 0, 0);
 
+            break;
+
+        case 'KeyM':
+            if (mute_on) {
+                sound.setVolume(0.2);
+                mute_on = false;
+            }
+            else mute();
+            break;
+
+        case 'KeyN':
+            if (music_plays) music_stop();
+            else music_start();
+            break;
 
     }
 
