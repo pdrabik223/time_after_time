@@ -323,12 +323,12 @@ function init() {
 
 
 
-    add_platform(new THREE.Vector3(0, 3, 80), new THREE.Vector3(50, 8, 60));
-    add_platform(new THREE.Vector3(-40, 3, 240), new THREE.Vector3(50, 6, 70));
+    add_platform(new THREE.Vector3(0, -5, 85), new THREE.Vector3(50, 8, 60));
+    add_platform(new THREE.Vector3(-40, 0, 240), new THREE.Vector3(50, 6, 70));
 
-    add_platform(new THREE.Vector3(40, 9, 350), new THREE.Vector3(30, 8, 80));
+    add_platform(new THREE.Vector3(40, 5, 350), new THREE.Vector3(30, 8, 80));
 
-    add_platform(new THREE.Vector3(-20, 11, 450), new THREE.Vector3(30, 2, 80));
+    add_platform(new THREE.Vector3(-20, 9, 450), new THREE.Vector3(30, 2, 80));
 
     add_platform(new THREE.Vector3(-30, 8, 600), new THREE.Vector3(50, 4, 80));
     add_platform(new THREE.Vector3(20, 14, 750), new THREE.Vector3(50, 3, 50));
