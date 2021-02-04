@@ -339,7 +339,7 @@ function init() {
     add_platform(new THREE.Vector3(90, 20, 990), new THREE.Vector3(40, 4, 60));
 
 
-    add_platform(new THREE.Vector3(60, 30, 1100), new THREE.Vector3(50, 5, 90));
+    add_platform(new THREE.Vector3(60, 30, 1100), new THREE.Vector3(60, 3, 110));
 
 
     add_platform(new THREE.Vector3(90, 35, 1300), new THREE.Vector3(40, 5, 80));
@@ -357,44 +357,51 @@ function init() {
 
     add_platform(new THREE.Vector3(60, 40, 2500), new THREE.Vector3(40, 3, 50));
 
-    add_platform(new THREE.Vector3(40, 40, 2600), new THREE.Vector3(30, 3, 50));
+    add_platform(new THREE.Vector3(40, 40, 2600), new THREE.Vector3(30, 4, 50));
 
     add_platform(new THREE.Vector3(30, 40, 2700), new THREE.Vector3(30, 3, 50));
 
 
-    add_platform(new THREE.Vector3(40, 40, 2800), new THREE.Vector3(30, 3, 80));
+    add_platform(new THREE.Vector3(40, 40, 2800), new THREE.Vector3(30, 2, 80));
 
-    add_platform(new THREE.Vector3(50, 45, 2900), new THREE.Vector3(30, 3, 90));
-
-
-    add_platform(new THREE.Vector3(60, 50, 3000), new THREE.Vector3(30, 3, 90));
+    add_platform(new THREE.Vector3(50, 45, 2900), new THREE.Vector3(30, 1, 90));
 
 
-    add_platform(new THREE.Vector3(70, 55, 3150), new THREE.Vector3(30, 3, 120));
-
-
-    add_platform(new THREE.Vector3(80, 55, 3300), new THREE.Vector3(80, 3, 100));
+    add_platform(new THREE.Vector3(60, 50, 3000), new THREE.Vector3(30, 6, 90));
 
 
 
-    add_platform(new THREE.Vector3(600, 60, 3400), new THREE.Vector3(80, 3, 80));
+    add_platform(new THREE.Vector3(50, 50, 3100), new THREE.Vector3(40, 6, 60));
 
 
-    add_platform(new THREE.Vector3(70, 65, 3500), new THREE.Vector3(80, 3, 80));
+
+    add_platform(new THREE.Vector3(70, 55, 3150), new THREE.Vector3(30, 2, 120));
+
+
+    add_platform(new THREE.Vector3(80, 55, 3250), new THREE.Vector3(80, 3, 100));
+
+
+    add_platform(new THREE.Vector3(70, 55, 3350), new THREE.Vector3(80, 3, 100));
+
+
+    add_platform(new THREE.Vector3(60, 60, 3400), new THREE.Vector3(80, 1, 80));
+
+
+    add_platform(new THREE.Vector3(70, 65, 3500), new THREE.Vector3(80, 2, 80));
     add_platform(new THREE.Vector3(40, 75, 3600), new THREE.Vector3(80, 3, 80));
-    add_platform(new THREE.Vector3(-60, 95, 3650), new THREE.Vector3(80, 3, 80));
-    add_platform(new THREE.Vector3(-110, 105, 3600), new THREE.Vector3(80, 3, 80));
-    add_platform(new THREE.Vector3(-110, 105, 3550), new THREE.Vector3(80, 3, 80));
-
-    add_platform(new THREE.Vector3(-190, 125, 3450), new THREE.Vector3(80, 3, 80));
+    add_platform(new THREE.Vector3(-60, 95, 3650), new THREE.Vector3(80, 1, 80));
+    add_platform(new THREE.Vector3(-90, 105, 3550), new THREE.Vector3(80, 2, 80));
 
 
-    add_platform(new THREE.Vector3(-210, 135, 3300), new THREE.Vector3(80, 3, 80));
+    add_platform(new THREE.Vector3(-110, 125, 3450), new THREE.Vector3(80, 4, 80));
 
-    add_platform(new THREE.Vector3(-180, 145, 3200), new THREE.Vector3(60, 3, 70));
-    add_platform(new THREE.Vector3(-160, 155, 3100), new THREE.Vector3(60, 3, 70));
 
-    add_platform(new THREE.Vector3(-180, 165, 3000), new THREE.Vector3(90, 3, 90));
+    add_platform(new THREE.Vector3(-120, 135, 3300), new THREE.Vector3(80, 1, 80));
+
+    add_platform(new THREE.Vector3(-160, 145, 3200), new THREE.Vector3(60, 3, 70));
+    add_platform(new THREE.Vector3(-180, 155, 3100), new THREE.Vector3(60, 2, 70));
+
+    add_platform(new THREE.Vector3(-180, 165, 3000), new THREE.Vector3(90, 1, 90));
 
 
     let dyjamond = new THREE.Mesh(new THREE.SphereGeometry(4, 4, 2), new THREE.MeshBasicMaterial({ color: 0x17d2fc, transparent: true, opacity: 0.9 }));
@@ -769,11 +776,9 @@ function render() {
     player.position.set(player.position.x + v_przemieszczenia.x, player.position.y + v_przemieszczenia.y, player.position.z + v_przemieszczenia.z);
     if (player.position.y < -100) {
 
-        player.position.set(0, 50, -45);
-        timer = new THREE.Clock(true);
-        v_przemieszczenia.set(0, 0, 0);
-        s_position.set(0, 50, -45);
-        s_v_przemieszczenia.set(0, 0, 0);
+        player.position.copy(s_position);
+        // timer = new THREE.Clock(true);
+        v_przemieszczenia.copy(s_v_przemieszczenia);
 
     }
 
@@ -783,10 +788,6 @@ function render() {
     }
     if (free_camera_bool) renderer.render(scene, player_camera);
     else renderer.render(scene, player_camera);
-
-
-
-
 
 
     requestAnimationFrame(render);
