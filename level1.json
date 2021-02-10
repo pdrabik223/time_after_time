@@ -1,0 +1,84 @@
+{
+    "level_name": "demo",
+    "author": "piotr233",
+    "author_time": 126.01,
+    "time_table": [
+        {
+            "name": "piotr233",
+            "time": 126.01
+        }
+    ],
+    "finish": [
+        -180,
+        155,
+        2900
+    ],
+    "platforms_lenght": 5,
+    "platforms": [
+        {
+            "type": "basic",
+            "position": [
+                0,
+                -5,
+                85
+            ],
+            "size": [
+                50,
+                8,
+                60
+            ]
+        },
+        {
+            "type": "basic",
+            "position": [
+                40,
+                0,
+                240
+            ],
+            "size": [
+                50,
+                6,
+                70
+            ]
+        },
+        {
+            "type": "basic",
+            "position": [
+                40,
+                5,
+                350
+            ],
+            "size": [
+                30,
+                8,
+                80
+            ]
+        },
+        {
+            "type": "basic",
+            "position": [
+                -20,
+                9,
+                450
+            ],
+            "size": [
+                30,
+                2,
+                80
+            ]
+        },
+        {
+            "type": "basic",
+            "position": [
+                -30,
+                8,
+                600
+            ],
+            "size": [
+                50,
+                4,
+                80
+            ]
+        }
+    ]
+}
